@@ -3,8 +3,18 @@ import psycopg2
 from models import Order
 from matching_engine import run_matching
 from models import Order, User
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 conn = psycopg2.connect(
     host="localhost",
