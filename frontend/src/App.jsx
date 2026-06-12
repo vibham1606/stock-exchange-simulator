@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import "./App.css";
+
 function App() {
   const [page, setPage] = useState("users");
   const [orders, setOrders] = useState([]);
@@ -138,9 +140,21 @@ const getPortfolio = async () => {
 
 };
   return (
-    <div>
+  <div className="container">
 
-      <h1>Stock Exchange Simulator</h1>
+      <div className="header">
+
+  <h1 className="title">
+    Stock Exchange Simulator
+  </h1>
+
+  <p className="subtitle">
+     NSE / BSE Trading Administration Panel
+  </p>
+
+
+</div>
+      <div className="navbar"> 
       <button onClick={() => setPage("dashboard")}>
         Dashboard
       </button>
@@ -178,6 +192,8 @@ const getPortfolio = async () => {
         Run Matching Engine
       </button>
 
+      </div>
+
       <hr />
 
       {page === "dashboard" && (
@@ -186,11 +202,24 @@ const getPortfolio = async () => {
 
           <h2>Dashboard</h2>
 
-          <p>Total Users: {users.length}</p>
+          <div className="cards">
 
-          <p>Total Orders: {orders.length}</p>
+  <div className="card">
+    <h3>Users</h3>
+    <p>{users.length}</p>
+  </div>
 
-          <p>Total Trades: {trades.length}</p>
+  <div className="card">
+    <h3>Orders</h3>
+    <p>{orders.length}</p>
+  </div>
+
+  <div className="card">
+    <h3>Trades</h3>
+    <p>{trades.length}</p>
+  </div>
+
+</div>
 
         </div>
 
@@ -460,7 +489,9 @@ Create User
 
       {page === "portfolio" && (
 
-  <div>
+   <div className="form-card">
+
+    <h2>Portfolio</h2>
 
     <h2>Portfolio</h2>
 
@@ -471,9 +502,12 @@ Create User
       }
     />
 
-    <button onClick={getPortfolio}>
-      View Portfolio
-    </button>
+    <button
+  className="portfolio-btn"
+  onClick={getPortfolio}
+>
+  View Portfolio
+</button>
 
     <br /><br />
 
@@ -510,7 +544,7 @@ Create User
 
       {page === "placeorder" && (
 
-<div>
+<div className="form-card">
 
 <h2>Place Order</h2>
 
