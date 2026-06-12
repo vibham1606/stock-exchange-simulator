@@ -5,6 +5,10 @@ function App() {
   const [trades, setTrades] = useState([]);
   const [users, setUsers] = useState([]);
   const [portfolio, setPortfolio] = useState([]);
+  const [orderBook, setOrderBook] = useState({
+  buy_orders: [],
+  sell_orders: []
+    });
   const [portfolioUserId, setPortfolioUserId] = useState("");
   const [order, setOrder] = useState({
   order_id: "",
@@ -15,6 +19,23 @@ function App() {
   stock_id: ""
 });
 
+const [createUser, setCreateUser] = useState({
+  user_id: "",
+  name: "",
+  balance: ""
+});
+
+
+
+  useEffect(() => {
+
+  fetch("http://127.0.0.1:8000/orderbook")
+    .then((response) => response.json())
+    .then((data) => {
+      setOrderBook(data);
+    });
+
+}, []);
   useEffect(() => {
 
   fetch("http://127.0.0.1:8000/orders")
@@ -43,6 +64,37 @@ useEffect(() => {
     });
 
 }, []);
+
+
+const addUser = async () => {
+
+  await fetch("http://127.0.0.1:8000/user", {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify(createUser)
+
+  });
+
+  alert("User Created");
+
+};
+const deleteOrder = async (orderId) => {
+
+  await fetch(
+    `http://127.0.0.1:8000/order/${orderId}`,
+    {
+      method: "DELETE"
+    }
+  );
+
+  alert("Order Deleted");
+
+};
 
  const placeOrder = async () => {
 
@@ -85,7 +137,6 @@ const getPortfolio = async () => {
   setPortfolio(data);
 
 };
-
   return (
     <div>
 
@@ -102,6 +153,10 @@ const getPortfolio = async () => {
         Orders
       </button>
 
+      <button onClick={() => setPage("orderbook")}>
+      Order Book
+      </button>
+
       <button onClick={() => setPage("trades")}>
         Trades
       </button>
@@ -113,6 +168,11 @@ const getPortfolio = async () => {
       <button onClick={() => setPage("placeorder")}>
       Place Order
       </button>
+
+      <button onClick={() => setPage("createuser")}>
+      Create User
+      </button>
+
 
       <button onClick={runMatching}>
         Run Matching Engine
@@ -135,6 +195,57 @@ const getPortfolio = async () => {
         </div>
 
       )}
+
+      {page === "createuser" && (
+
+<div>
+
+<h2>Create User</h2>
+
+<input
+placeholder="User ID"
+onChange={(e) =>
+setCreateUser({
+  ...createUser,
+  user_id: Number(e.target.value)
+})
+}
+/>
+
+<br /><br />
+
+<input
+placeholder="Name"
+onChange={(e) =>
+setCreateUser({
+  ...createUser,
+  name: e.target.value
+})
+}
+/>
+
+<br /><br />
+
+<input
+placeholder="Balance"
+onChange={(e) =>
+setCreateUser({
+  ...createUser,
+  balance: Number(e.target.value)
+})
+}
+/>
+
+<br /><br />
+
+<button onClick={addUser}>
+Create User
+</button>
+
+</div>
+
+)}
+
 
      {page === "users" && (
 
@@ -192,6 +303,7 @@ const getPortfolio = async () => {
           <th>Price</th>
           <th>Quantity</th>
           <th>Stock ID</th>
+          <th>Delete</th>
         </tr>
       </thead>
 
@@ -199,16 +311,24 @@ const getPortfolio = async () => {
 
         {orders.map((order) => (
 
-          <tr key={order.order_id}>
+<tr key={order.order_id}>
 
-            <td>{order.order_id}</td>
-            <td>{order.user_id}</td>
-            <td>{order.order_type}</td>
-            <td>{order.price}</td>
-            <td>{order.quantity}</td>
-            <td>{order.stock_id}</td>
+  <td>{order.order_id}</td>
+  <td>{order.user_id}</td>
+  <td>{order.order_type}</td>
+  <td>{order.price}</td>
+  <td>{order.quantity}</td>
+  <td>{order.stock_id}</td>
 
-          </tr>
+  <td>
+    <button
+      onClick={() => deleteOrder(order.order_id)}
+    >
+      Delete
+    </button>
+  </td>
+
+</tr>
 
         ))}
 
@@ -217,6 +337,82 @@ const getPortfolio = async () => {
     </table>
 
   </div>
+
+)}
+
+{page === "orderbook" && (
+
+<div>
+
+<h2>Order Book</h2>
+
+<h3>Buy Orders</h3>
+
+<table border="1">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>User</th>
+<th>Stock</th>
+<th>Price</th>
+<th>Qty</th>
+</tr>
+</thead>
+
+<tbody>
+
+{orderBook.buy_orders.map((order) => (
+
+<tr key={order.order_id}>
+<td>{order.order_id}</td>
+<td>{order.user}</td>
+<td>{order.stock}</td>
+<td>{order.price}</td>
+<td>{order.quantity}</td>
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+<br />
+
+<h3>Sell Orders</h3>
+
+<table border="1">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>User</th>
+<th>Stock</th>
+<th>Price</th>
+<th>Qty</th>
+</tr>
+</thead>
+
+<tbody>
+
+{orderBook.sell_orders.map((order) => (
+
+<tr key={order.order_id}>
+<td>{order.order_id}</td>
+<td>{order.user}</td>
+<td>{order.stock}</td>
+<td>{order.price}</td>
+<td>{order.quantity}</td>
+</tr>
+
+))}
+
+</tbody>
+
+</table>
+
+</div>
 
 )}
 
@@ -387,5 +583,6 @@ Submit Order
     </div>
   );
 }
+
 
 export default App;
